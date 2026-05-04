@@ -2,20 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chevron Lines - Logistics Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; font-size: 13px; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; font-size: 13px; overflow-x: hidden; }
         .formal-input { border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; outline: none; width: 100%; transition: all 0.2s; }
         .formal-input:focus { border-color: #1e293b; }
         
-        /* Mobile Table Fix */
-        .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { min-width: 1000px; } 
+        /* ULTIMATE MOBILE TABLE FIX */
+        .outer-wrapper { width: 100%; overflow: hidden; border: 1px solid #e2e8f0; border-radius: 8px; }
+        .table-container { 
+            width: 100%; 
+            overflow-x: auto !important; 
+            display: block;
+            -webkit-overflow-scrolling: touch; 
+        }
+        table { 
+            min-width: 1200px; /* Forces enough width for all columns to be visible via scroll */
+            width: 100%;
+            border-collapse: collapse;
+        }
 
         .suggestion-box { position: absolute; z-index: 100; width: 100%; max-height: 150px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-top: 2px; }
         .suggestion-item { padding: 6px 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
@@ -45,28 +55,22 @@
         <div id="printTableContainer"></div>
     </div>
 
-    <div class="max-w-[1550px] mx-auto px-4 py-4 no-print">
+    <div class="max-w-[1550px] mx-auto px-2 md:px-4 py-4 no-print">
         <header class="flex justify-between items-center bg-slate-900 text-white p-4 rounded-t-lg">
             <div>
-                <h1 class="text-lg font-bold">CHEVRON LINES (C & F) LTD.</h1>
-                <p class="text-[10px] text-slate-400 font-medium">LIVE DATABASE PORTAL</p>
+                <h1 class="text-base md:text-lg font-bold">CHEVRON LINES (C & F) LTD.</h1>
+                <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Mobile-Optimized Database</p>
             </div>
-            <button id="lockBtn" onclick="toggleAdmin()" class="bg-white text-slate-900 px-4 py-1.5 rounded text-xs font-bold hover:bg-slate-100">
+            <button id="lockBtn" onclick="toggleAdmin()" class="bg-white text-slate-900 px-3 py-1.5 rounded text-[11px] font-bold hover:bg-slate-100">
                 <span id="lockText">Unlock Editor</span>
             </button>
         </header>
 
-        <section id="adminPanel" class="hidden bg-white border-x border-b border-slate-200 p-6 shadow-sm mb-6">
+        <section id="adminPanel" class="hidden bg-white border-x border-b border-slate-200 p-4 md:p-6 shadow-sm mb-6">
             <form id="entryForm" class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 <input type="hidden" id="editId">
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase">Program Date</label><input type="date" id="entryDate" class="formal-input" required></div>
-                
-                <!-- Job No: Reverted to Standard Text Input -->
-                <div class="relative">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase">Job No</label>
-                    <input type="text" id="jobNo" class="formal-input font-bold" placeholder="e.g. 50/26" required>
-                </div>
-
+                <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase">Job No</label><input type="text" id="jobNo" class="formal-input font-bold" placeholder="e.g. 50/26" required></div>
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase">Importer</label><input type="text" id="importer" class="formal-input" required></div>
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase">Item</label><input type="text" id="item" class="formal-input" required></div>
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase">BL No</label><input type="text" id="bl_no" class="formal-input bg-slate-50" readonly></div>
@@ -81,54 +85,55 @@
                 <div class="relative" id="transportParent"><label class="text-[10px] font-bold text-slate-500 uppercase">Transport</label><input type="text" id="transport" class="formal-input bg-slate-100" disabled autocomplete="off"></div>
                 
                 <div class="md:col-span-2 flex gap-2 pt-4">
-                    <button type="submit" class="bg-blue-700 text-white px-6 py-2 rounded font-bold text-xs">SAVE TO DB</button>
-                    <button type="button" onclick="cancelEdit()" class="bg-slate-200 text-slate-600 px-4 py-2 rounded font-bold text-xs">CLEAR</button>
+                    <button type="submit" class="bg-blue-700 text-white px-6 py-2 rounded font-bold text-xs uppercase">Save Data</button>
+                    <button type="button" onclick="cancelEdit()" class="bg-slate-200 text-slate-600 px-4 py-2 rounded font-bold text-xs uppercase">Clear</button>
                 </div>
             </form>
         </section>
 
-        <div class="flex flex-wrap gap-4 items-end bg-white p-4 border border-slate-200 rounded-lg mt-4 shadow-sm">
-            <div class="flex-1 min-w-[200px]">
+        <div class="flex flex-wrap gap-3 items-end bg-white p-4 border border-slate-200 rounded-lg mt-4 shadow-sm">
+            <div class="w-full md:flex-1">
                 <label class="text-[10px] font-bold text-slate-500 uppercase">Global Search</label>
-                <input type="text" id="globalSearch" oninput="refreshTable()" placeholder="Search..." class="formal-input">
+                <input type="text" id="globalSearch" oninput="refreshTable()" placeholder="Job, Importer, Person..." class="formal-input">
             </div>
-            <div>
-                <label class="text-[10px] font-bold text-slate-500 uppercase">Category</label>
-                <select id="filterCategory" onchange="refreshTable()" class="formal-input">
-                    <option value="all">Show All</option>
-                    <option value="examine">Examination Only</option>
-                    <option value="delivery">Delivery Only</option>
-                </select>
+            <div class="flex-1 min-w-[120px]">
+                <label class="text-[10px] font-bold text-slate-500 uppercase">From</label><input type="date" id="filterFrom" onchange="refreshTable()" class="formal-input">
             </div>
-            <div><label class="text-[10px] font-bold text-slate-500 uppercase">From</label><input type="date" id="filterFrom" onchange="refreshTable()" class="formal-input"></div>
-            <div><label class="text-[10px] font-bold text-slate-500 uppercase">To</label><input type="date" id="filterTo" onchange="refreshTable()" class="formal-input"></div>
-            <button onclick="refreshTable()" class="bg-slate-800 text-white px-8 py-2 rounded text-xs font-bold">APPLY</button>
-            <button onclick="clearFilters()" class="bg-slate-200 text-slate-700 px-4 py-2 rounded text-xs font-bold">RESET</button>
-            <button onclick="printReport()" class="bg-emerald-700 text-white px-8 py-2 rounded text-xs font-bold">PRINT PDF</button>
+            <div class="flex-1 min-w-[120px]">
+                <label class="text-[10px] font-bold text-slate-500 uppercase">To</label><input type="date" id="filterTo" onchange="refreshTable()" class="formal-input">
+            </div>
+            <div class="w-full md:w-auto flex gap-2">
+                <button onclick="refreshTable()" class="flex-1 bg-slate-800 text-white px-6 py-2 rounded text-xs font-bold">APPLY</button>
+                <button onclick="clearFilters()" class="bg-slate-200 text-slate-700 px-4 py-2 rounded text-xs font-bold">RESET</button>
+            </div>
+            <button onclick="printReport()" class="w-full md:w-auto bg-emerald-700 text-white px-8 py-2 rounded text-xs font-bold uppercase">Print PDF</button>
         </div>
 
-        <div class="mt-6 bg-white border border-slate-200 rounded shadow-sm overflow-hidden table-container">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-slate-100 border-b border-slate-300">
-                    <tr>
-                        <th class="p-2 text-[10px] font-bold uppercase border-r">DB ID</th>
-                        <th class="p-2 text-[10px] font-bold uppercase border-r">Date</th>
-                        <th class="p-2 text-[10px] font-bold uppercase border-r">Job No</th>
-                        <th class="p-2 text-[10px] font-bold uppercase border-r">Importer</th>
-                        <th class="p-2 text-[10px] font-bold uppercase border-r">Item</th>
-                        <th class="p-2 text-[10px] font-bold uppercase border-r">BL No</th>
-                        <th class="p-2 text-[10px] font-bold uppercase text-center border-r">EXM</th>
-                        <th class="p-2 text-[10px] font-bold uppercase text-center border-r">DEL</th>
-                        <th class="p-2 text-[10px] font-bold uppercase border-r">Yard</th>
-                        <th class="p-2 text-[10px] font-bold uppercase border-r">Assign</th>
-                        <th class="p-2 text-[10px] font-bold uppercase border-r">Transport</th>
-                        <th class="p-2 text-[10px] font-bold uppercase text-center admin-action hidden">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="dataTable" class="divide-y divide-slate-200"></tbody>
-            </table>
+        <!-- UPDATED WRAPPER FOR SCROLLING -->
+        <div class="mt-6 outer-wrapper">
+            <div class="table-container">
+                <table class="text-left">
+                    <thead class="bg-slate-100 border-b border-slate-300">
+                        <tr>
+                            <th class="p-3 text-[10px] font-bold uppercase border-r w-[80px]">DB ID</th>
+                            <th class="p-3 text-[10px] font-bold uppercase border-r w-[110px]">Date</th>
+                            <th class="p-3 text-[10px] font-bold uppercase border-r w-[120px]">Job No</th>
+                            <th class="p-3 text-[10px] font-bold uppercase border-r">Importer</th>
+                            <th class="p-3 text-[10px] font-bold uppercase border-r">Item</th>
+                            <th class="p-3 text-[10px] font-bold uppercase border-r w-[150px]">BL No</th>
+                            <th class="p-3 text-[10px] font-bold uppercase text-center border-r w-[60px]">EXM</th>
+                            <th class="p-3 text-[10px] font-bold uppercase text-center border-r w-[60px]">DEL</th>
+                            <th class="p-3 text-[10px] font-bold uppercase border-r w-[130px]">Yard</th>
+                            <th class="p-3 text-[10px] font-bold uppercase border-r w-[130px]">Assign</th>
+                            <th class="p-3 text-[10px] font-bold uppercase border-r w-[150px]">Transport</th>
+                            <th class="p-3 text-[10px] font-bold uppercase text-center admin-action hidden w-[100px]">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable" class="divide-y divide-slate-200"></tbody>
+                </table>
+            </div>
         </div>
-        <p id="filterWarning" class="text-center text-slate-400 py-4 text-xs italic">Showing Today's Data Only. Use date filters to see history.</p>
+        <p id="filterWarning" class="text-center text-slate-400 py-4 text-xs italic">Showing Today's Data Only. Scroll right to see all columns.</p>
     </div>
 
     <script>
@@ -160,14 +165,12 @@
                     document.getElementById('adminPanel').classList.remove('hidden');
                     document.querySelectorAll('.admin-action').forEach(e => e.classList.remove('hidden'));
                     document.getElementById('lockText').innerText = "Lock Editor";
-                    document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
                 }
             } else {
                 isEditMode = false;
                 document.getElementById('adminPanel').classList.add('hidden');
                 document.querySelectorAll('.admin-action').forEach(e => e.classList.add('hidden'));
                 document.getElementById('lockText').innerText = "Unlock Editor";
-                cancelEdit();
             }
         }
 
@@ -195,11 +198,9 @@
         document.getElementById('entryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const editId = document.getElementById('editId').value;
-            const jobNo = document.getElementById('jobNo').value;
-            
             const entry = {
                 program_date: document.getElementById('entryDate').value,
-                job_no: jobNo,
+                job_no: document.getElementById('jobNo').value,
                 importer: document.getElementById('importer').value,
                 item: document.getElementById('item').value,
                 bl_no: document.getElementById('bl_no').value,
@@ -209,10 +210,8 @@
                 delivery: document.getElementById('delivery').checked,
                 transport: document.getElementById('transport').value || '-'
             };
-
             if (editId) await _supabase.from('programs').update(entry).eq('id', editId);
             else await _supabase.from('programs').insert([entry]);
-
             cancelEdit();
             await fetchRecords();
         });
@@ -222,23 +221,18 @@
             const from = document.getElementById('filterFrom').value;
             const to = document.getElementById('filterTo').value;
             const q = document.getElementById('globalSearch').value.toLowerCase();
-            const cat = document.getElementById('filterCategory').value;
             const warning = document.getElementById('filterWarning');
 
             let filtered = [...records];
             const today = new Date().toISOString().split('T')[0];
 
-            if (isInitial && !from && !to && !q && cat === 'all') {
+            if (isInitial && !from && !to && !q) {
                 filtered = filtered.filter(r => r.program_date === today);
                 warning.style.display = 'block';
             } else {
                 warning.style.display = 'none';
                 if (from && to) filtered = filtered.filter(r => r.program_date >= from && r.program_date <= to);
                 else if (from) filtered = filtered.filter(r => r.program_date === from);
-                
-                if (cat === 'examine') filtered = filtered.filter(r => r.examine);
-                if (cat === 'delivery') filtered = filtered.filter(r => r.delivery);
-
                 if (q) {
                     filtered = filtered.filter(r => 
                         r.job_no.toLowerCase().includes(q) || 
@@ -250,18 +244,18 @@
 
             tbody.innerHTML = filtered.map((r) => `
                 <tr class="hover:bg-slate-50 transition">
-                    <td class="p-2 border-r text-center text-slate-400 font-mono">#${r.id}</td>
-                    <td class="p-2 border-r whitespace-nowrap">${formatDate(r.program_date)}</td>
-                    <td class="p-2 border-r font-bold">${r.job_no}</td>
-                    <td class="p-2 border-r">${r.importer}</td>
-                    <td class="p-2 border-r">${r.item}</td>
-                    <td class="p-2 border-r font-mono text-[9px]">${r.bl_no || '-'}</td>
-                    <td class="p-2 border-r text-center font-bold">${r.examine ? 'Y' : '-'}</td>
-                    <td class="p-2 border-r text-center font-bold">${r.delivery ? 'Y' : '-'}</td>
-                    <td class="p-2 border-r">${r.yard}</td>
-                    <td class="p-2 border-r font-semibold">${r.person}</td>
-                    <td class="p-2 border-r">${r.transport}</td>
-                    <td class="p-2 text-center admin-action ${isEditMode ? '' : 'hidden'}">
+                    <td class="p-3 border-r text-center text-slate-400 font-mono">#${r.id}</td>
+                    <td class="p-3 border-r whitespace-nowrap">${formatDate(r.program_date)}</td>
+                    <td class="p-3 border-r font-bold">${r.job_no}</td>
+                    <td class="p-3 border-r">${r.importer}</td>
+                    <td class="p-3 border-r">${r.item}</td>
+                    <td class="p-3 border-r font-mono text-[10px]">${r.bl_no || '-'}</td>
+                    <td class="p-3 border-r text-center font-bold">${r.examine ? 'Y' : '-'}</td>
+                    <td class="p-3 border-r text-center font-bold">${r.delivery ? 'Y' : '-'}</td>
+                    <td class="p-3 border-r">${r.yard}</td>
+                    <td class="p-3 border-r font-semibold text-blue-900">${r.person}</td>
+                    <td class="p-3 border-r">${r.transport}</td>
+                    <td class="p-3 text-center admin-action ${isEditMode ? '' : 'hidden'}">
                         <button onclick="editRecord(${r.id})" class="text-blue-600 font-bold mr-2">E</button>
                         <button onclick="deleteRecord(${r.id})" class="text-red-500 font-bold">D</button>
                     </td>
@@ -304,7 +298,6 @@
             document.getElementById('filterFrom').value = '';
             document.getElementById('filterTo').value = '';
             document.getElementById('globalSearch').value = '';
-            document.getElementById('filterCategory').value = 'all';
             refreshTable(true); 
         }
 
