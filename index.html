@@ -15,7 +15,7 @@
         .smart-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         .outer-wrapper { width: 100%; overflow: hidden; border: 1px solid #e2e8f0; border-radius: 8px; background: white; }
         .table-container { width: 100%; overflow-x: auto !important; display: block; -webkit-overflow-scrolling: touch; }
-        table { min-width: 1250px; width: 100%; border-collapse: collapse; }
+        table { min-width: 1550px; width: 100%; border-collapse: collapse; }
         .suggestion-box { position: absolute; z-index: 100; width: 100%; max-height: 150px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 4px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); margin-top: 2px; }
         .suggestion-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 12px; transition: background 0.2s; }
         .suggestion-item:hover { background-color: #f8fafc; color: #0f172a; font-weight: 600; }
@@ -26,7 +26,7 @@
             #printArea, #printArea * { visibility: visible; }
             #printArea { position: absolute; left: 0; top: 0; width: 100%; }
             table { width: 100% !important; border-collapse: collapse !important; border: 1px solid #000 !important; min-width: 100% !important; }
-            th, td { border: 1px solid #000 !important; padding: 6px !important; font-size: 10px !important; color: black !important; }
+            th, td { border: 1px solid #000 !important; padding: 4px !important; font-size: 8px !important; color: black !important; }
             th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; font-weight: bold; }
             .no-print { display: none !important; }
         }
@@ -34,6 +34,7 @@
 </head>
 <body class="text-slate-900">
 
+    <!-- Print View -->
     <div id="printArea" class="hidden print:block">
         <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 15px;">
             <h1 style="font-size: 26px; font-weight: 800; margin: 0; color: #000;">CHEVRON LINES (C & F) LTD.</h1>
@@ -44,7 +45,7 @@
         <div id="printTableContainer"></div>
     </div>
 
-    <div class="max-w-[1550px] mx-auto px-2 md:px-4 py-4 no-print">
+    <div class="max-w-[1700px] mx-auto px-2 md:px-4 py-4 no-print">
         <header class="smart-header text-white p-4 md:p-5 rounded-t-xl shadow-lg">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -63,7 +64,6 @@
                             <p id="totalDelCount" class="text-lg md:text-xl font-black text-blue-400 leading-none">0</p>
                         </div>
                     </div>
-                    
                     <button id="lockBtn" onclick="toggleAdmin()" class="bg-white text-slate-900 px-3 py-2 md:px-4 md:py-2 rounded-md text-[10px] md:text-[11px] font-bold shadow-sm hover:bg-slate-100 transition-all uppercase whitespace-nowrap">
                         <span id="lockText">Unlock Editor</span>
                     </button>
@@ -71,62 +71,48 @@
             </div>
         </header>
 
-        <!-- Admin Panel -->
+        <!-- Admin Editor -->
         <section id="adminPanel" class="hidden bg-white border-x border-b border-slate-200 p-4 md:p-6 shadow-sm mb-6">
-            <div id="duplicateWarning" class="hidden mb-4 p-3 bg-amber-50 border-l-4 border-amber-500 text-amber-800 text-xs font-medium flex items-center justify-between">
-                <span>⚠️ Note: This Job No has already been entered on a previous date.</span>
-                <button onclick="this.parentElement.classList.add('hidden')" class="font-bold underline">Dismiss</button>
+            <div id="duplicateWarning" class="hidden mb-4 p-2 bg-amber-50 border-l-4 border-amber-500 text-amber-800 text-[10px] font-bold uppercase">
+                ⚠️ This Job No has already been entered on a previous date.
             </div>
-
             <form id="entryForm" class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 <input type="hidden" id="editId">
-                <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Program Date</label><input type="date" id="entryDate" class="formal-input" required></div>
-                <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Job No</label><input type="text" id="jobNo" class="formal-input font-bold" placeholder="e.g. 50/26" required oninput="checkDuplicateJob(this.value)"></div>
+                <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Date</label><input type="date" id="entryDate" class="formal-input" required></div>
+                <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Job No</label><input type="text" id="jobNo" class="formal-input font-bold" required oninput="checkDuplicateJob(this.value)"></div>
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Importer</label><input type="text" id="importer" class="formal-input" required></div>
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Item</label><input type="text" id="item" class="formal-input" required></div>
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">BL No</label><input type="text" id="bl_no" class="formal-input bg-slate-50" readonly></div>
                 <div class="relative" id="yardParent"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Yard</label><input type="text" id="yard" class="formal-input" required autocomplete="off"></div>
                 <div class="relative" id="personParent"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Person</label><input type="text" id="person" class="formal-input" required autocomplete="off"></div>
+                <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Mobile</label><input type="text" id="mobile" class="formal-input" placeholder="01..." required></div>
                 
-                <div class="flex items-center gap-4 bg-slate-50 p-2 border rounded border-slate-200">
-                    <label class="flex items-center gap-1 text-[11px] font-bold cursor-pointer"><input type="checkbox" id="examine" class="w-4 h-4"> EXM</label>
-                    <label class="flex items-center gap-1 text-[11px] font-bold cursor-pointer"><input type="checkbox" id="delivery" class="w-4 h-4" onchange="checkTransport()"> DEL</label>
+                <div class="flex flex-wrap items-center gap-3 bg-slate-50 p-2 border rounded border-slate-200 lg:col-span-2">
+                    <label class="flex items-center gap-1 text-[10px] font-bold cursor-pointer"><input type="checkbox" id="examine" class="w-4 h-4"> EXM</label>
+                    <label class="flex items-center gap-1 text-[10px] font-bold cursor-pointer"><input type="checkbox" id="delivery" class="w-4 h-4" onchange="checkTransport()"> DEL</label>
+                    <label id="chassisLabel" class="flex items-center gap-1 text-[10px] font-bold cursor-pointer opacity-40"><input type="checkbox" id="is_chassis" class="w-4 h-4" disabled> CHASSIS</label>
+                    <label id="openLabel" class="flex items-center gap-1 text-[10px] font-bold cursor-pointer opacity-40"><input type="checkbox" id="is_open" class="w-4 h-4" disabled> OPEN</label>
                 </div>
                 
                 <div class="relative" id="transportParent"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Transport</label><input type="text" id="transport" class="formal-input bg-slate-100" disabled autocomplete="off"></div>
                 
                 <div class="md:col-span-2 flex gap-2 pt-4">
-                    <button type="submit" class="bg-blue-700 text-white px-6 py-2 rounded font-bold text-xs uppercase hover:bg-blue-800 transition shadow-md">Save Record</button>
-                    <button type="button" onclick="cancelEdit()" class="bg-slate-200 text-slate-600 px-4 py-2 rounded font-bold text-xs uppercase hover:bg-slate-300 transition">Clear</button>
+                    <button type="submit" class="bg-blue-700 text-white px-6 py-2 rounded font-bold text-xs uppercase hover:bg-blue-800 shadow-md transition">Save</button>
+                    <button type="button" onclick="cancelEdit()" class="bg-slate-200 text-slate-600 px-4 py-2 rounded font-bold text-xs uppercase hover:bg-slate-300">Clear</button>
                 </div>
             </form>
         </section>
 
         <!-- Filters -->
         <div class="flex flex-wrap gap-3 items-end bg-white p-4 border border-slate-200 rounded-xl mt-4 shadow-md">
-            <div class="w-full md:flex-1">
-                <label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Global Search</label>
-                <input type="text" id="globalSearch" oninput="refreshTable()" placeholder="Job, Importer, Person..." class="formal-input">
+            <div class="w-full md:flex-1"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Search</label><input type="text" id="globalSearch" oninput="refreshTable()" placeholder="Job, Importer, Person..." class="formal-input"></div>
+            <div class="w-full md:w-auto"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Category</label>
+                <select id="filterCategory" onchange="refreshTable()" class="formal-input min-w-[130px]"><option value="all">All</option><option value="examine">Examine</option><option value="delivery">Delivery</option></select>
             </div>
-            <div class="w-full md:w-auto">
-                <label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Category</label>
-                <select id="filterCategory" onchange="refreshTable()" class="formal-input min-w-[140px]">
-                    <option value="all">Show All</option>
-                    <option value="examine">Examine Only</option>
-                    <option value="delivery">Delivery Only</option>
-                </select>
-            </div>
-            <div class="flex-1 min-w-[120px]">
-                <label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">From</label><input type="date" id="filterFrom" onchange="refreshTable()" class="formal-input">
-            </div>
-            <div class="flex-1 min-w-[120px]">
-                <label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">To</label><input type="date" id="filterTo" onchange="refreshTable()" class="formal-input">
-            </div>
-            <div class="w-full md:w-auto flex gap-2">
-                <button onclick="refreshTable()" class="flex-1 bg-slate-900 text-white px-6 py-2 rounded text-xs font-bold hover:bg-black transition">APPLY</button>
-                <button onclick="clearFilters()" class="bg-slate-200 text-slate-700 px-4 py-2 rounded text-xs font-bold">RESET</button>
-            </div>
-            <button onclick="printReport()" class="w-full md:w-auto bg-emerald-700 text-white px-8 py-2 rounded text-xs font-bold uppercase hover:bg-emerald-800 transition shadow-md">Print PDF</button>
+            <div class="flex-1 min-w-[110px]"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">From</label><input type="date" id="filterFrom" onchange="refreshTable()" class="formal-input"></div>
+            <div class="flex-1 min-w-[110px]"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">To</label><input type="date" id="filterTo" onchange="refreshTable()" class="formal-input"></div>
+            <button onclick="clearFilters()" class="bg-slate-100 text-slate-600 px-4 py-2 rounded text-[10px] font-bold uppercase">Reset</button>
+            <button onclick="printReport()" class="bg-emerald-700 text-white px-8 py-2 rounded text-[10px] font-bold uppercase hover:bg-emerald-800 shadow-md transition">Print PDF</button>
         </div>
 
         <!-- Table -->
@@ -135,18 +121,21 @@
                 <table class="text-left">
                     <thead class="bg-slate-50 border-b-2 border-slate-200">
                         <tr>
-                            <th class="p-4 text-[10px] font-extrabold uppercase border-r text-slate-500 w-[50px]">SL</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase border-r text-slate-500 w-[110px]">Date</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase border-r text-slate-700 w-[120px]">Job No</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase border-r text-slate-700">Importer</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase border-r text-slate-700">Item Description</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase border-r text-slate-700 w-[150px]">BL Number</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase text-center border-r w-[60px]">EXM</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase text-center border-r w-[60px]">DEL</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase border-r w-[130px]">Yard</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase border-r w-[130px]">Assignee</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase border-r w-[150px]">Transport</th>
-                            <th class="p-4 text-[10px] font-extrabold uppercase text-center admin-action hidden w-[100px]">Action</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r text-slate-500 text-center w-[40px]">SL</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r text-slate-500 w-[100px]">Date</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r text-slate-700 w-[110px]">Job No</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r text-slate-700">Importer</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r text-slate-700">Item</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r text-slate-700 w-[130px]">BL Number</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase text-center border-r w-[45px]">EXM</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase text-center border-r w-[45px]">DEL</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase text-center border-r w-[55px]">CHAS</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase text-center border-r w-[45px]">OPEN</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r w-[120px]">Yard</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r w-[130px]">Assignee</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r w-[110px]">Mobile</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r w-[130px]">Transport</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase text-center admin-action hidden w-[100px]">Action</th>
                         </tr>
                     </thead>
                     <tbody id="dataTable" class="divide-y divide-slate-200"></tbody>
@@ -166,10 +155,7 @@
 
         async function fetchRecords() {
             const { data, error } = await _supabase.from('programs').select('*').order('id', { ascending: false });
-            if (!error) {
-                records = data;
-                refreshTable(true); 
-            }
+            if (!error) { records = data; refreshTable(true); }
         }
 
         function formatDate(dateStr) {
@@ -185,7 +171,6 @@
                     document.getElementById('adminPanel').classList.remove('hidden');
                     document.querySelectorAll('.admin-action').forEach(e => e.classList.remove('hidden'));
                     document.getElementById('lockText').innerText = "Lock Editor";
-                    document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
                 }
             } else {
                 isEditMode = false;
@@ -200,13 +185,11 @@
             const warning = document.getElementById('duplicateWarning');
             if(!val || val.length < 3) { warning.classList.add('hidden'); return; }
             const exists = records.some(r => r.job_no.toLowerCase() === val.toLowerCase() && r.id != document.getElementById('editId').value);
-            if(exists) warning.classList.remove('hidden');
-            else warning.classList.add('hidden');
+            warning.classList.toggle('hidden', !exists);
         }
 
         async function autoFillFromSupabase() {
-            const jobField = document.getElementById('jobNo');
-            const val = jobField.value.trim();
+            const val = document.getElementById('jobNo').value.trim();
             if(!val) return;
             const { data } = await _supabase.from('assessments').select('*').eq('job', val).maybeSingle();
             if (data) {
@@ -220,9 +203,19 @@
         function checkTransport() {
             const del = document.getElementById('delivery').checked;
             const t = document.getElementById('transport');
+            const chas = document.getElementById('is_chassis');
+            const open = document.getElementById('is_open');
+            const cL = document.getElementById('chassisLabel');
+            const oL = document.getElementById('openLabel');
+
             t.disabled = !del;
             t.classList.toggle('bg-slate-100', !del);
-            if (!del) t.value = '';
+            chas.disabled = !del;
+            open.disabled = !del;
+            cL.classList.toggle('opacity-40', !del);
+            oL.classList.toggle('opacity-40', !del);
+
+            if (!del) { t.value = ''; chas.checked = false; open.checked = false; }
         }
 
         document.getElementById('entryForm').addEventListener('submit', async (e) => {
@@ -236,8 +229,11 @@
                 bl_no: document.getElementById('bl_no').value,
                 yard: document.getElementById('yard').value,
                 person: document.getElementById('person').value,
+                mobile: document.getElementById('mobile').value,
                 examine: document.getElementById('examine').checked,
                 delivery: document.getElementById('delivery').checked,
+                is_chassis: document.getElementById('is_chassis').checked,
+                is_open: document.getElementById('is_open').checked,
                 transport: document.getElementById('transport').value || '-'
             };
             if (editId) await _supabase.from('programs').update(entry).eq('id', editId);
@@ -259,9 +255,9 @@
 
             if (isInitial && !from && !to && !q && cat === 'all') {
                 filtered = filtered.filter(r => r.program_date === today);
-                warning.style.display = 'block';
+                warning.classList.remove('hidden');
             } else {
-                warning.style.display = 'none';
+                warning.classList.add('hidden');
                 if (from && to) filtered = filtered.filter(r => r.program_date >= from && r.program_date <= to);
                 else if (from) filtered = filtered.filter(r => r.program_date === from);
                 if (cat === 'examine') filtered = filtered.filter(r => r.examine);
@@ -275,36 +271,45 @@
                 }
             }
 
-            const exmCount = filtered.filter(r => r.examine).length;
-            const delCount = filtered.filter(r => r.delivery).length;
-            document.getElementById('totalExmCount').innerText = exmCount;
-            document.getElementById('totalDelCount').innerText = delCount;
+            document.getElementById('totalExmCount').innerText = filtered.filter(r => r.examine).length;
+            document.getElementById('totalDelCount').innerText = filtered.filter(r => r.delivery).length;
 
-            tbody.innerHTML = filtered.map((r, index) => `
-                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="p-4 border-r text-center font-bold text-slate-500">${index + 1}</td>
-                    <td class="p-4 border-r font-medium whitespace-nowrap">${formatDate(r.program_date)}</td>
-                    <td class="p-4 border-r font-bold text-slate-900">${r.job_no}</td>
-                    <td class="p-4 border-r font-medium">${r.importer}</td>
-                    <td class="p-4 border-r text-slate-600">${r.item}</td>
-                    <td class="p-4 border-r font-mono text-[10px] text-slate-500">${r.bl_no || '-'}</td>
-                    <td class="p-4 border-r text-center font-black">${r.examine ? '✓' : '-'}</td>
-                    <td class="p-4 border-r text-center font-black">${r.delivery ? '✓' : '-'}</td>
-                    <td class="p-4 border-r">${r.yard}</td>
-                    <td class="p-4 border-r font-semibold text-blue-700">${r.person}</td>
-                    <td class="p-4 border-r">${r.transport}</td>
-                    <td class="p-4 text-center admin-action ${isEditMode ? '' : 'hidden'}">
-                        <button onclick="editRecord(${r.id})" class="text-blue-600 font-bold mr-2 hover:underline text-[10px]">EDIT</button>
-                        <button onclick="deleteRecord(${r.id})" class="text-red-500 font-bold hover:underline text-[10px]">DEL</button>
+            tbody.innerHTML = filtered.map((r, i) => `
+                <tr class="hover:bg-slate-50 border-b">
+                    <td class="p-3 border-r text-center font-bold text-slate-400">${i+1}</td>
+                    <td class="p-3 border-r whitespace-nowrap">${formatDate(r.program_date)}</td>
+                    <td class="p-3 border-r font-bold">${r.job_no}</td>
+                    <td class="p-3 border-r">${r.importer}</td>
+                    <td class="p-3 border-r">${r.item}</td>
+                    <td class="p-3 border-r font-mono text-[10px] text-slate-500">${r.bl_no || '-'}</td>
+                    <td class="p-3 border-r text-center font-black">${r.examine ? '✓' : '-'}</td>
+                    <td class="p-3 border-r text-center font-black">${r.delivery ? '✓' : '-'}</td>
+                    <td class="p-3 border-r text-center font-black">${r.is_chassis ? '✓' : '-'}</td>
+                    <td class="p-3 border-r text-center font-black">${r.is_open ? '✓' : '-'}</td>
+                    <td class="p-3 border-r">${r.yard}</td>
+                    <td class="p-3 border-r font-semibold text-blue-700">${r.person}</td>
+                    <td class="p-3 border-r text-[11px] font-medium">${r.mobile || '-'}</td>
+                    <td class="p-3 border-r">${r.transport}</td>
+                    <td class="p-3 text-center admin-action ${isEditMode ? '' : 'hidden'}">
+                        <button onclick="editRecord(${r.id})" class="text-blue-600 font-bold mr-2 text-[10px]">EDIT</button>
+                        <button onclick="deleteRecord(${r.id})" class="text-red-500 font-bold text-[10px]">DEL</button>
                     </td>
                 </tr>`).join('');
         }
 
-        async function deleteRecord(id) {
-            if(confirm(`Delete record?`)) {
-                await _supabase.from('programs').delete().eq('id', id);
-                await fetchRecords();
-            }
+        function printReport() {
+            const from = document.getElementById('filterFrom').value;
+            const to = document.getElementById('filterTo').value;
+            const dateDisplay = document.getElementById('printDateDisplay');
+            if (!from && !to) dateDisplay.innerText = `FOR DATE: ${formatDate(new Date().toISOString().split('T')[0])}`;
+            else dateDisplay.innerText = `PERIOD: ${formatDate(from)} TO ${formatDate(to || from)}`;
+            
+            const originalTable = document.querySelector('table').cloneNode(true);
+            originalTable.querySelectorAll('.admin-action').forEach(a => a.remove());
+            
+            document.getElementById('printTableContainer').innerHTML = '';
+            document.getElementById('printTableContainer').appendChild(originalTable);
+            window.print();
         }
 
         function editRecord(id) {
@@ -317,45 +322,20 @@
             document.getElementById('bl_no').value = r.bl_no || '';
             document.getElementById('yard').value = r.yard;
             document.getElementById('person').value = r.person;
+            document.getElementById('mobile').value = r.mobile || '';
             document.getElementById('examine').checked = r.examine;
             document.getElementById('delivery').checked = r.delivery;
+            document.getElementById('is_chassis').checked = r.is_chassis;
+            document.getElementById('is_open').checked = r.is_open;
             document.getElementById('transport').value = r.transport === '-' ? '' : r.transport;
             checkTransport();
             document.getElementById('adminPanel').classList.remove('hidden');
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        function cancelEdit() { 
-            document.getElementById('entryForm').reset(); 
-            document.getElementById('editId').value = ""; 
-            document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('duplicateWarning').classList.add('hidden');
-            checkTransport(); 
-        }
-
-        function clearFilters() {
-            document.getElementById('filterFrom').value = '';
-            document.getElementById('filterTo').value = '';
-            document.getElementById('filterCategory').value = 'all';
-            document.getElementById('globalSearch').value = '';
-            refreshTable(true); 
-        }
-
-        function printReport() {
-            const from = document.getElementById('filterFrom').value;
-            const to = document.getElementById('filterTo').value;
-            const dateDisplay = document.getElementById('printDateDisplay');
-            if (!from && !to) dateDisplay.innerText = `FOR DATE: ${formatDate(new Date().toISOString().split('T')[0])}`;
-            else if (from === to || !to || !from) dateDisplay.innerText = `FOR DATE: ${formatDate(from || to)}`;
-            else dateDisplay.innerText = `PERIOD: ${formatDate(from)} TO ${formatDate(to)}`;
-            
-            const originalTable = document.querySelector('table').cloneNode(true);
-            originalTable.querySelectorAll('.admin-action').forEach(a => a.remove());
-            
-            document.getElementById('printTableContainer').innerHTML = '';
-            document.getElementById('printTableContainer').appendChild(originalTable);
-            window.print();
-        }
+        async function deleteRecord(id) { if(confirm('Delete this record?')) { await _supabase.from('programs').delete().eq('id', id); fetchRecords(); } }
+        function cancelEdit() { document.getElementById('entryForm').reset(); document.getElementById('editId').value = ""; checkTransport(); }
+        function clearFilters() { document.getElementById('filterFrom').value=''; document.getElementById('filterTo').value=''; document.getElementById('filterCategory').value='all'; document.getElementById('globalSearch').value=''; refreshTable(true); }
 
         const setupSug = (inputId, parentId, dbField) => {
             const input = document.getElementById(inputId);
@@ -367,12 +347,9 @@
                 if (!val || records.length === 0) return;
                 const matches = [...new Set(records.map(r => r[dbField]).filter(v => v && v !== '-' && v.toLowerCase().includes(val)))].slice(0, 5);
                 if (matches.length > 0) {
-                    const box = document.createElement('div');
-                    box.className = 'suggestion-box';
+                    const box = document.createElement('div'); box.className = 'suggestion-box';
                     matches.forEach(m => {
-                        const div = document.createElement('div');
-                        div.className = 'suggestion-item';
-                        div.innerText = m;
+                        const div = document.createElement('div'); div.className = 'suggestion-item'; div.innerText = m;
                         div.onclick = () => { input.value = m; box.remove(); };
                         box.appendChild(div);
                     });
@@ -380,7 +357,6 @@
                 }
             });
         };
-
         setupSug('yard', 'yardParent', 'yard');
         setupSug('person', 'personParent', 'person');
         setupSug('transport', 'transportParent', 'transport');
