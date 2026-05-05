@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Delivery and Examine Program</title>
+    <title>Chevron Lines - Logistics Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,9 +16,10 @@
         .outer-wrapper { width: 100%; overflow: hidden; border: 1px solid #e2e8f0; border-radius: 8px; background: white; }
         .table-container { width: 100%; overflow-x: auto !important; display: block; -webkit-overflow-scrolling: touch; }
         table { min-width: 1550px; width: 100%; border-collapse: collapse; }
-        .suggestion-box { position: absolute; z-index: 100; width: 100%; max-height: 150px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 4px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); margin-top: 2px; }
-        .suggestion-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 12px; transition: background 0.2s; }
-        .suggestion-item:hover { background-color: #f8fafc; color: #0f172a; font-weight: 600; }
+        
+        .suggestion-box { position: absolute; z-index: 100; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 4px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); margin-top: 2px; }
+        .suggestion-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 12px; transition: all 0.1s; }
+        .suggestion-item:hover, .suggestion-item.selected { background-color: #0f172a; color: white; font-weight: 600; }
 
         @media print {
             @page { size: landscape; margin: 10mm; }
@@ -34,7 +35,6 @@
 </head>
 <body class="text-slate-900">
 
-    <!-- Print View -->
     <div id="printArea" class="hidden print:block">
         <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 15px;">
             <h1 style="font-size: 26px; font-weight: 800; margin: 0; color: #000;">CHEVRON LINES (C & F) LTD.</h1>
@@ -52,7 +52,6 @@
                     <h1 class="text-lg md:text-xl font-extrabold tracking-tight">CHEVRON LINES (C & F) LTD.</h1>
                     <p class="text-[11px] text-slate-300 font-semibold uppercase tracking-widest">Delivery and Examine Smart Program</p>
                 </div>
-                
                 <div class="flex items-center justify-between w-full md:w-auto gap-4 md:gap-6">
                     <div class="flex gap-4 text-left md:text-right md:border-r border-slate-700 md:pr-6">
                         <div>
@@ -64,18 +63,15 @@
                             <p id="totalDelCount" class="text-lg md:text-xl font-black text-blue-400 leading-none">0</p>
                         </div>
                     </div>
-                    <button id="lockBtn" onclick="toggleAdmin()" class="bg-white text-slate-900 px-3 py-2 md:px-4 md:py-2 rounded-md text-[10px] md:text-[11px] font-bold shadow-sm hover:bg-slate-100 transition-all uppercase whitespace-nowrap">
+                    <button id="lockBtn" onclick="toggleAdmin()" class="bg-white text-slate-900 px-3 py-2 md:px-4 md:py-2 rounded-md text-[10px] md:text-[11px] font-bold shadow-sm hover:bg-slate-100 transition-all uppercase">
                         <span id="lockText">Unlock Editor</span>
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- Admin Editor -->
         <section id="adminPanel" class="hidden bg-white border-x border-b border-slate-200 p-4 md:p-6 shadow-sm mb-6">
-            <div id="duplicateWarning" class="hidden mb-4 p-2 bg-amber-50 border-l-4 border-amber-500 text-amber-800 text-[10px] font-bold uppercase">
-                ⚠️ This Job No has already been entered on a previous date.
-            </div>
+            <div id="duplicateWarning" class="hidden mb-4 p-2 bg-amber-50 border-l-4 border-amber-500 text-amber-800 text-[10px] font-bold uppercase">⚠️ Duplicate Job No detected.</div>
             <form id="entryForm" class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 <input type="hidden" id="editId">
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Date</label><input type="date" id="entryDate" class="formal-input" required></div>
@@ -83,6 +79,7 @@
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Importer</label><input type="text" id="importer" class="formal-input" required></div>
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Item</label><input type="text" id="item" class="formal-input" required></div>
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">BL No</label><input type="text" id="bl_no" class="formal-input bg-slate-50" readonly></div>
+                
                 <div class="relative" id="yardParent"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Yard</label><input type="text" id="yard" class="formal-input" required autocomplete="off"></div>
                 <div class="relative" id="personParent"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Person</label><input type="text" id="person" class="formal-input" required autocomplete="off"></div>
                 <div class="relative"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Mobile</label><input type="text" id="mobile" class="formal-input" placeholder="01..." required></div>
@@ -97,13 +94,12 @@
                 <div class="relative" id="transportParent"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Transport</label><input type="text" id="transport" class="formal-input bg-slate-100" disabled autocomplete="off"></div>
                 
                 <div class="md:col-span-2 flex gap-2 pt-4">
-                    <button type="submit" class="bg-blue-700 text-white px-6 py-2 rounded font-bold text-xs uppercase hover:bg-blue-800 shadow-md transition">Save</button>
+                    <button type="submit" class="bg-blue-700 text-white px-6 py-2 rounded font-bold text-xs uppercase hover:bg-blue-800 transition">Save</button>
                     <button type="button" onclick="cancelEdit()" class="bg-slate-200 text-slate-600 px-4 py-2 rounded font-bold text-xs uppercase hover:bg-slate-300">Clear</button>
                 </div>
             </form>
         </section>
 
-        <!-- Filters -->
         <div class="flex flex-wrap gap-3 items-end bg-white p-4 border border-slate-200 rounded-xl mt-4 shadow-md">
             <div class="w-full md:flex-1"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Search</label><input type="text" id="globalSearch" oninput="refreshTable()" placeholder="Job, Importer, Person..." class="formal-input"></div>
             <div class="w-full md:w-auto"><label class="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Category</label>
@@ -115,10 +111,9 @@
             <button onclick="printReport()" class="bg-emerald-700 text-white px-8 py-2 rounded text-[10px] font-bold uppercase hover:bg-emerald-800 shadow-md transition">Print PDF</button>
         </div>
 
-        <!-- Table -->
         <div class="mt-6 outer-wrapper shadow-xl">
             <div class="table-container">
-                <table class="text-left">
+                <table>
                     <thead class="bg-slate-50 border-b-2 border-slate-200">
                         <tr>
                             <th class="p-3 text-[10px] font-extrabold uppercase border-r text-slate-500 text-center w-[40px]">SL</th>
@@ -131,18 +126,17 @@
                             <th class="p-3 text-[10px] font-extrabold uppercase text-center border-r w-[45px]">DEL</th>
                             <th class="p-3 text-[10px] font-extrabold uppercase text-center border-r w-[55px]">CHAS</th>
                             <th class="p-3 text-[10px] font-extrabold uppercase text-center border-r w-[45px]">OPEN</th>
-                            <th class="p-3 text-[10px] font-extrabold uppercase border-r w-[120px]">Yard/Shed/Depot</th>
+                            <th class="p-3 text-[10px] font-extrabold uppercase border-r w-[120px]">Yard</th>
                             <th class="p-3 text-[10px] font-extrabold uppercase border-r w-[130px]">Assignee</th>
                             <th class="p-3 text-[10px] font-extrabold uppercase border-r w-[110px]">Mobile</th>
                             <th class="p-3 text-[10px] font-extrabold uppercase border-r w-[130px]">Transport</th>
-                            <th class="p-3 text-[10px] font-extrabold uppercase text-center admin-action hidden w-[100px]">Action</th>
+                            <th class="p-3 text-center admin-action hidden w-[100px]">Action</th>
                         </tr>
                     </thead>
                     <tbody id="dataTable" class="divide-y divide-slate-200"></tbody>
                 </table>
             </div>
         </div>
-        <p id="filterWarning" class="text-center text-slate-400 py-4 text-xs font-medium italic">Viewing today's program. Apply filters for history.</p>
     </div>
 
     <script>
@@ -158,10 +152,16 @@
             if (!error) { records = data; refreshTable(true); }
         }
 
-        function formatDate(dateStr) {
-            if(!dateStr) return "-";
-            const [y, m, d] = dateStr.split("-");
-            return `${d}-${m}-${y}`;
+        function setTodayDate() {
+            document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        function checkTransport() {
+            const del = document.getElementById('delivery').checked;
+            ['transport', 'is_chassis', 'is_open'].forEach(id => document.getElementById(id).disabled = !del);
+            document.getElementById('chassisLabel').classList.toggle('opacity-40', !del);
+            document.getElementById('openLabel').classList.toggle('opacity-40', !del);
+            if(!del) { document.getElementById('transport').value = ''; document.getElementById('is_chassis').checked = false; document.getElementById('is_open').checked = false; }
         }
 
         function toggleAdmin() {
@@ -171,19 +171,80 @@
                     document.getElementById('adminPanel').classList.remove('hidden');
                     document.querySelectorAll('.admin-action').forEach(e => e.classList.remove('hidden'));
                     document.getElementById('lockText').innerText = "Lock Editor";
+                    setTodayDate();
                 }
-            } else {
-                isEditMode = false;
-                document.getElementById('adminPanel').classList.add('hidden');
-                document.querySelectorAll('.admin-action').forEach(e => e.classList.add('hidden'));
-                document.getElementById('lockText').innerText = "Unlock Editor";
-                cancelEdit();
-            }
+            } else { isEditMode = false; document.getElementById('adminPanel').classList.add('hidden'); document.querySelectorAll('.admin-action').forEach(e => e.classList.add('hidden')); document.getElementById('lockText').innerText = "Unlock Editor"; cancelEdit(); }
         }
+
+        const setupSug = (inputId, parentId, dbField) => {
+            const input = document.getElementById(inputId);
+            const parent = document.getElementById(parentId);
+            let selectedIndex = -1;
+
+            const onValueSelected = (val) => {
+                input.value = val;
+                if (dbField === 'person') {
+                    const found = records.find(r => r.person === val && r.mobile);
+                    if (found) document.getElementById('mobile').value = found.mobile;
+                }
+                const b = parent.querySelector('.suggestion-box');
+                if(b) b.remove();
+            };
+
+            const showMatches = () => {
+                const val = input.value.toLowerCase();
+                let existing = parent.querySelector('.suggestion-box');
+                if (existing) existing.remove();
+
+                const allValues = [...new Set(records.map(r => r[dbField]).filter(v => v && v !== '-'))];
+                const matches = val === "" ? allValues : allValues.filter(v => v.toLowerCase().includes(val));
+
+                if (matches.length > 0) {
+                    const box = document.createElement('div');
+                    box.className = 'suggestion-box';
+                    matches.forEach((m, i) => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.innerText = m;
+                        div.onclick = () => onValueSelected(m);
+                        box.appendChild(div);
+                    });
+                    parent.appendChild(box);
+                    selectedIndex = -1;
+                }
+            };
+
+            input.addEventListener('focus', showMatches);
+            input.addEventListener('input', showMatches);
+            input.addEventListener('keydown', (e) => {
+                const box = parent.querySelector('.suggestion-box');
+                if (!box) return;
+                const items = box.querySelectorAll('.suggestion-item');
+                if (e.key === 'ArrowDown') {
+                    selectedIndex = (selectedIndex + 1) % items.length;
+                    items.forEach((it, i) => it.classList.toggle('selected', i === selectedIndex));
+                    e.preventDefault();
+                } else if (e.key === 'ArrowUp') {
+                    selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                    items.forEach((it, i) => it.classList.toggle('selected', i === selectedIndex));
+                    e.preventDefault();
+                } else if (e.key === 'Enter') {
+                    if (selectedIndex > -1) {
+                        onValueSelected(items[selectedIndex].innerText);
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            document.addEventListener('click', (e) => { if (!parent.contains(e.target)) { const b = parent.querySelector('.suggestion-box'); if(b) b.remove(); } });
+        };
+
+        setupSug('yard', 'yardParent', 'yard');
+        setupSug('person', 'personParent', 'person');
+        setupSug('transport', 'transportParent', 'transport');
 
         async function checkDuplicateJob(val) {
             const warning = document.getElementById('duplicateWarning');
-            if(!val || val.length < 3) { warning.classList.add('hidden'); return; }
             const exists = records.some(r => r.job_no.toLowerCase() === val.toLowerCase() && r.id != document.getElementById('editId').value);
             warning.classList.toggle('hidden', !exists);
         }
@@ -199,24 +260,6 @@
             }
         }
         document.getElementById('jobNo').addEventListener('blur', autoFillFromSupabase);
-
-        function checkTransport() {
-            const del = document.getElementById('delivery').checked;
-            const t = document.getElementById('transport');
-            const chas = document.getElementById('is_chassis');
-            const open = document.getElementById('is_open');
-            const cL = document.getElementById('chassisLabel');
-            const oL = document.getElementById('openLabel');
-
-            t.disabled = !del;
-            t.classList.toggle('bg-slate-100', !del);
-            chas.disabled = !del;
-            open.disabled = !del;
-            cL.classList.toggle('opacity-40', !del);
-            oL.classList.toggle('opacity-40', !del);
-
-            if (!del) { t.value = ''; chas.checked = false; open.checked = false; }
-        }
 
         document.getElementById('entryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -239,7 +282,7 @@
             if (editId) await _supabase.from('programs').update(entry).eq('id', editId);
             else await _supabase.from('programs').insert([entry]);
             cancelEdit();
-            await fetchRecords();
+            fetchRecords();
         });
 
         function refreshTable(isInitial = false) {
@@ -248,36 +291,25 @@
             const to = document.getElementById('filterTo').value;
             const cat = document.getElementById('filterCategory').value;
             const q = document.getElementById('globalSearch').value.toLowerCase();
-            const warning = document.getElementById('filterWarning');
-
             let filtered = [...records];
             const today = new Date().toISOString().split('T')[0];
 
-            if (isInitial && !from && !to && !q && cat === 'all') {
-                filtered = filtered.filter(r => r.program_date === today);
-                warning.classList.remove('hidden');
-            } else {
-                warning.classList.add('hidden');
+            if (isInitial && !from && !to && !q && cat === 'all') filtered = filtered.filter(r => r.program_date === today);
+            else {
                 if (from && to) filtered = filtered.filter(r => r.program_date >= from && r.program_date <= to);
-                else if (from) filtered = filtered.filter(r => r.program_date === from);
                 if (cat === 'examine') filtered = filtered.filter(r => r.examine);
                 if (cat === 'delivery') filtered = filtered.filter(r => r.delivery);
-                if (q) {
-                    filtered = filtered.filter(r => 
-                        r.job_no.toLowerCase().includes(q) || 
-                        r.importer.toLowerCase().includes(q) || 
-                        r.person.toLowerCase().includes(q)
-                    );
-                }
+                if (q) filtered = filtered.filter(r => r.job_no.toLowerCase().includes(q) || r.importer.toLowerCase().includes(q) || r.person.toLowerCase().includes(q));
             }
 
+            // Restore Counter logic
             document.getElementById('totalExmCount').innerText = filtered.filter(r => r.examine).length;
             document.getElementById('totalDelCount').innerText = filtered.filter(r => r.delivery).length;
 
             tbody.innerHTML = filtered.map((r, i) => `
                 <tr class="hover:bg-slate-50 border-b">
                     <td class="p-3 border-r text-center font-bold text-slate-400">${i+1}</td>
-                    <td class="p-3 border-r whitespace-nowrap">${formatDate(r.program_date)}</td>
+                    <td class="p-3 border-r whitespace-nowrap">${r.program_date.split('-').reverse().join('-')}</td>
                     <td class="p-3 border-r font-bold">${r.job_no}</td>
                     <td class="p-3 border-r">${r.importer}</td>
                     <td class="p-3 border-r">${r.item}</td>
@@ -295,21 +327,6 @@
                         <button onclick="deleteRecord(${r.id})" class="text-red-500 font-bold text-[10px]">DEL</button>
                     </td>
                 </tr>`).join('');
-        }
-
-        function printReport() {
-            const from = document.getElementById('filterFrom').value;
-            const to = document.getElementById('filterTo').value;
-            const dateDisplay = document.getElementById('printDateDisplay');
-            if (!from && !to) dateDisplay.innerText = `FOR DATE: ${formatDate(new Date().toISOString().split('T')[0])}`;
-            else dateDisplay.innerText = `PERIOD: ${formatDate(from)} TO ${formatDate(to || from)}`;
-            
-            const originalTable = document.querySelector('table').cloneNode(true);
-            originalTable.querySelectorAll('.admin-action').forEach(a => a.remove());
-            
-            document.getElementById('printTableContainer').innerHTML = '';
-            document.getElementById('printTableContainer').appendChild(originalTable);
-            window.print();
         }
 
         function editRecord(id) {
@@ -333,33 +350,26 @@
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        async function deleteRecord(id) { if(confirm('Delete this record?')) { await _supabase.from('programs').delete().eq('id', id); fetchRecords(); } }
-        function cancelEdit() { document.getElementById('entryForm').reset(); document.getElementById('editId').value = ""; checkTransport(); }
-        function clearFilters() { document.getElementById('filterFrom').value=''; document.getElementById('filterTo').value=''; document.getElementById('filterCategory').value='all'; document.getElementById('globalSearch').value=''; refreshTable(true); }
+        async function deleteRecord(id) { if(confirm('Delete?')) { await _supabase.from('programs').delete().eq('id', id); fetchRecords(); } }
+        
+        function cancelEdit() { 
+            document.getElementById('entryForm').reset(); 
+            document.getElementById('editId').value = ""; 
+            setTodayDate(); 
+            checkTransport(); 
+        }
 
-        const setupSug = (inputId, parentId, dbField) => {
-            const input = document.getElementById(inputId);
-            input.addEventListener('input', () => {
-                const val = input.value.toLowerCase();
-                const parent = document.getElementById(parentId);
-                const old = parent.querySelector('.suggestion-box');
-                if (old) old.remove();
-                if (!val || records.length === 0) return;
-                const matches = [...new Set(records.map(r => r[dbField]).filter(v => v && v !== '-' && v.toLowerCase().includes(val)))].slice(0, 5);
-                if (matches.length > 0) {
-                    const box = document.createElement('div'); box.className = 'suggestion-box';
-                    matches.forEach(m => {
-                        const div = document.createElement('div'); div.className = 'suggestion-item'; div.innerText = m;
-                        div.onclick = () => { input.value = m; box.remove(); };
-                        box.appendChild(div);
-                    });
-                    parent.appendChild(box);
-                }
-            });
-        };
-        setupSug('yard', 'yardParent', 'yard');
-        setupSug('person', 'personParent', 'person');
-        setupSug('transport', 'transportParent', 'transport');
+        function clearFilters() { document.getElementById('filterFrom').value=''; document.getElementById('filterTo').value=''; document.getElementById('filterCategory').value='all'; document.getElementById('globalSearch').value=''; refreshTable(true); }
+        
+        function printReport() { 
+            const dateDisplay = document.getElementById('printDateDisplay');
+            dateDisplay.innerText = `FOR DATE: ${new Date().toISOString().split('T')[0].split('-').reverse().join('-')}`;
+            const originalTable = document.querySelector('table').cloneNode(true);
+            originalTable.querySelectorAll('.admin-action').forEach(a => a.remove());
+            document.getElementById('printTableContainer').innerHTML = '';
+            document.getElementById('printTableContainer').appendChild(originalTable);
+            window.print(); 
+        }
 
         window.onload = fetchRecords;
     </script>
